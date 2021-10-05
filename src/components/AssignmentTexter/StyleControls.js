@@ -25,7 +25,6 @@ export const messageListStyles = {
     color: "white",
     backgroundColor: "hsla(206, 99%, 31%, 0.74)", //#01579B",
     borderRadius: "16px",
-    //fontWeight: "600",
     fontSize: "110%",
     lineHeight: "120%",
     marginBottom: "10px",
@@ -62,8 +61,7 @@ export const flexStyles = StyleSheet.create({
     right: 0,
     display: "flex",
     flexDirection: "column",
-    height: "100%",
-    backgroundColor: bgGrey
+    height: "100%"
   },
   popoverSideboxesInner: {
     // expand to fill the whole popover
@@ -116,7 +114,6 @@ export const flexStyles = StyleSheet.create({
   },
   /// * Section Scrolling Message Thread
   sectionMessageThread: {
-    backgroundColor: "#f0f0f0",
     flex: "1 1 auto",
     overflowY: "scroll"
   },
@@ -143,8 +140,7 @@ export const flexStyles = StyleSheet.create({
     // messageField
     flex: "1 0 20px",
     padding: "0px 4px",
-    marginBottom: "8px",
-    backgroundColor: "white"
+    marginBottom: "8px"
   },
   subSectionMessageFieldTextField: {
     "@media(max-width: 350px)": {
@@ -167,8 +163,7 @@ export const flexStyles = StyleSheet.create({
     display: "flex",
     // flexWrap: "wrap",
     overflow: "hidden",
-    position: "relative",
-    backgroundColor: bgGrey
+    position: "relative"
   },
   subButtonsAnswerButtons: {
     flex: "1 1 auto", // keeps bottom buttons in place
@@ -212,7 +207,6 @@ export const flexStyles = StyleSheet.create({
     flexWrap: "wrap",
     alignContent: "space-between",
     // to 'win' against absoslute positioned content above it:
-    backgroundColor: bgGrey,
     zIndex: "10",
     "@media (hover: hover) and (pointer: fine)": {
       // for touchpads and phones, the edge of the tablet is easier

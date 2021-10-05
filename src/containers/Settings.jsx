@@ -6,6 +6,7 @@ import Form from "react-formal";
 import moment from "moment";
 import * as yup from "yup";
 import { StyleSheet, css } from "aphrodite";
+import { compose } from "recompose";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -21,8 +22,8 @@ import IconButton from "@material-ui/core/IconButton";
 
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import loadData from "./hoc/load-data";
+import withSetTheme from "./hoc/withSetTheme";
 import GSSubmitButton from "../components/forms/GSSubmitButton";
-import theme from "../styles/theme";
 import DisplayLink from "../components/DisplayLink";
 import GSForm from "../components/forms/GSForm";
 import CampaignTexterUIForm from "../components/CampaignTexterUIForm";
@@ -30,6 +31,7 @@ import OrganizationFeatureSettings from "../components/OrganizationFeatureSettin
 import { getServiceVendorComponent } from "../extensions/service-vendors/components";
 import { getServiceManagerComponent } from "../extensions/service-managers/components";
 import GSTextField from "../components/forms/GSTextField";
+import GSColorPicker from "../components/forms/GSColorPicker";
 
 const styles = StyleSheet.create({
   section: {
@@ -46,31 +48,39 @@ const styles = StyleSheet.create({
     textAlign: "right"
   },
   cardHeader: {
-    cursor: "pointer",
-    backgroundColor: theme.colors.green,
-    color: theme.colors.white
+    cursor: "pointer"
   }
 });
-
-const inlineStyles = {
-  dialogButton: {
-    display: "inline-block"
-  },
-  shadeBox: {
-    backgroundColor: theme.colors.lightGray
-  },
-  errorBox: {
-    backgroundColor: theme.colors.lightGray,
-    color: theme.colors.darkRed,
-    fontWeight: "bolder"
-  }
-};
 
 const formatTextingHours = hour => moment(hour, "H").format("h a");
 class Settings extends React.Component {
   state = {
     formIsSubmitting: false
   };
+
+  inlineStyles = {
+    dialogButton: {
+      display: "inline-block"
+    },
+    shadeBox: {
+      backgroundColor: this.props.muiTheme.palette.action.hover
+    },
+    cardHeader: {
+      cursor: "pointer"
+    },
+    errorBox: {
+      backgroundColor: this.props.muiTheme.palette.action.hover,
+      color: this.props.muiTheme.palette,
+      fontWeight: "bolder"
+    }
+  };
+
+  getCardHeaderStyle() {
+    return Object.assign({}, this.inlineStyles.cardHeader, {
+      backgroundColor: this.props.muiTheme.palette.primary.main,
+      color: this.props.muiTheme.palette.primary.contrastText
+    });
+  }
 
   handleSubmitTextingHoursForm = async ({
     textingHoursStart,
@@ -144,7 +154,7 @@ class Settings extends React.Component {
               </Button>
               <Form.Submit
                 as={GSSubmitButton}
-                style={inlineStyles.dialogButton}
+                style={this.inlineStyles.dialogButton}
                 label="Save"
               />
             </div>
@@ -199,7 +209,7 @@ class Settings extends React.Component {
                   <ServiceManagerComp
                     serviceManagerInfo={sm}
                     organizationId={organizationId}
-                    inlineStyles={inlineStyles}
+                    inlineStyles={this.inlineStyles}
                     styles={styles}
                     saveLabel={this.props.saveLabel}
                     onSubmit={updateData =>
@@ -247,7 +257,7 @@ class Settings extends React.Component {
         <ConfigServiceVendor
           organizationId={organizationId}
           config={config}
-          inlineStyles={inlineStyles}
+          inlineStyles={this.inlineStyles}
           styles={styles}
           saveLabel={this.props.saveLabel}
           onSubmit={newConfig => {
@@ -271,16 +281,19 @@ class Settings extends React.Component {
       optOutMessage: yup.string().required()
     });
 
+    const themeFormSchema = yup.object({
+      primary: yup.string().required(),
+      secondary: yup.string().required(),
+      info: yup.string().required(),
+      success: yup.string().required(),
+      warning: yup.string().required(),
+      error: yup.string().required()
+    });
+
     return (
       <div>
         <Card>
-          <CardHeader
-            title="Settings"
-            style={{
-              backgroundColor: theme.colors.green,
-              color: theme.colors.white
-            }}
-          />
+          <CardHeader title="Settings" style={this.getCardHeaderStyle()} />
           <CardContent>
             <div className={css(styles.section)}>
               <GSForm
@@ -348,6 +361,73 @@ class Settings extends React.Component {
               </Button>
             )}
           </CardActions>
+          <CardContent>
+            <h2>Theme</h2>
+            <GSForm
+              schema={themeFormSchema}
+              onSubmit={data => {
+                this.props.mutations.updateTheme(data).then(() => {
+                  this.props.setTheme({
+                    palette: {
+                      primary: { main: data.primary },
+                      secondary: { main: data.secondary },
+                      info: { main: data.info },
+                      success: { main: data.success },
+                      warning: { main: data.warning },
+                      error: { main: data.error }
+                    }
+                  });
+                });
+              }}
+              defaultValue={{
+                primary: this.props.muiTheme.palette.primary.main,
+                secondary: this.props.muiTheme.palette.secondary.main,
+                info: this.props.muiTheme.palette.info.main,
+                success: this.props.muiTheme.palette.success.main,
+                warning: this.props.muiTheme.palette.warning.main,
+                error: this.props.muiTheme.palette.error.main
+              }}
+            >
+              <Form.Field
+                as={GSColorPicker}
+                label="Primary"
+                name="primary"
+                fullWidth
+              />
+              <Form.Field
+                as={GSColorPicker}
+                label="Secondary"
+                name="secondary"
+                fullWidth
+              />
+              <Form.Field
+                as={GSColorPicker}
+                label="Info"
+                name="info"
+                fullWidth
+              />
+              <Form.Field
+                as={GSColorPicker}
+                label="Success"
+                name="success"
+                fullWidth
+              />
+              <Form.Field
+                as={GSColorPicker}
+                label="Warning"
+                name="warning"
+                fullWidth
+              />
+              <Form.Field
+                as={GSColorPicker}
+                label="Error"
+                name="error"
+                fullWidth
+              />
+
+              <Form.Submit as={GSSubmitButton} label="Save Theme" />
+            </GSForm>
+          </CardContent>
         </Card>
         <div>{this.renderTextingHoursForm()}</div>
         {this.renderServiceManagers()}
@@ -358,7 +438,7 @@ class Settings extends React.Component {
             <Card>
               <CardHeader
                 title="Texter UI Defaults"
-                className={css(styles.cardHeader)}
+                style={this.getCardHeaderStyle()}
                 action={
                   <IconButton>
                     <ExpandMoreIcon />
@@ -401,7 +481,7 @@ class Settings extends React.Component {
           <Card>
             <CardHeader
               title="Overriding default settings"
-              className={css(styles.cardHeader)}
+              style={this.getCardHeaderStyle()}
               action={
                 <IconButton>
                   <ExpandMoreIcon />
@@ -446,7 +526,7 @@ class Settings extends React.Component {
           <Card>
             <CardHeader
               title="External configuration"
-              className={css(styles.cardHeader)}
+              style={this.getCardHeaderStyle()}
               action={
                 <IconButton>
                   <ExpandMoreIcon />
@@ -470,7 +550,8 @@ class Settings extends React.Component {
                 </p>
                 <Button
                   color="secondary"
-                  style={inlineStyles.dialogButton}
+                  variant="contained"
+                  style={this.inlineStyles.dialogButton}
                   onClick={
                     this.props.mutations.clearCachedOrgAndExtensionCaches
                   }
@@ -671,6 +752,47 @@ const mutations = {
       optOutMessage
     }
   }),
+  updateTheme: ownProps => ({
+    primary,
+    secondary,
+    info,
+    success,
+    warning,
+    error
+  }) => ({
+    mutation: gql`
+      mutation updateTheme(
+        $primary: String
+        $secondary: String
+        $info: String
+        $success: String
+        $warning: String
+        $error: String
+        $organizationId: String!
+      ) {
+        updateTheme(
+          primary: $primary
+          secondary: $secondary
+          info: $info
+          success: $success
+          warning: $warning
+          error: $error
+          organizationId: $organizationId
+        ) {
+          theme
+        }
+      }
+    `,
+    variables: {
+      organizationId: ownProps.params.organizationId,
+      primary,
+      secondary,
+      info,
+      success,
+      warning,
+      error
+    }
+  }),
   updateServiceVendorConfig: ownProps => newConfig => {
     return {
       mutation: updateServiceVendorConfigGql,
@@ -703,4 +825,7 @@ const mutations = {
   })
 };
 
-export default loadData({ queries, mutations })(Settings);
+export default compose(
+  withSetTheme,
+  loadData({ queries, mutations })
+)(Settings);
