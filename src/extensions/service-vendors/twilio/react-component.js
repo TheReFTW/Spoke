@@ -109,7 +109,7 @@ export class OrgConfig extends React.Component {
         {allSet && (
           <CardContent style={inlineStyles.shadeBox}>
             <DisplayLink
-              url={`${baseUrl}/twilio/${organizationId}`}
+              url={`${baseUrl}/twilio-message-report/${organizationId}`}
               textContent="Twilio credentials are configured for this organization. You should set the inbound Request URL in your Twilio messaging service to this link."
             />
             Settings for this organization:
