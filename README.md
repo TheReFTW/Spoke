@@ -50,4 +50,4 @@ Additional guidance:
 
 Spoke is licensed under the [GPL3 license with a special author attribution requirement](LICENSE).
 
-# Tiny Edits -- Continue
+# Tiny Edits -- Continue w/Tiny Deployment Edits
